@@ -1,5 +1,6 @@
 {
     "require": {
-        "react/http": "^1.9"
+        "react/http": "^1.9",
+        "nikic/fast-route": "^1.3"
     }
 }
