@@ -1,25 +1,39 @@
 <?php
 
+use App\Orders\Controller\CreateOrder;
+use App\Orders\Controller\DeleteOrder;
+use App\Orders\Controller\GetAllOrders;
+use App\Orders\Controller\GetOrderById;
+use App\Orders\Controller\UpdateOrder;
 use App\Products\Controller\CreateProduct;
+use App\Products\Controller\DeleteProduct;
 use App\Products\Controller\GetAllProducts;
+use App\Products\Controller\GetProductById;
+use App\Products\Controller\UpdateProduct;
 use App\Router;
 use FastRoute\DataGenerator\GroupCountBased;
-use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
-use Psr\Http\Message\ServerRequestInterface;
-use React\Http\Message\Response;
 use React\Http\HttpServer;
 use React\Socket\SocketServer;
-use function FastRoute\simpleDispatcher;
 
 require 'vendor/autoload.php';
 
 $loop = \React\EventLoop\Loop::get();
 
 $routes = new RouteCollector(new Std, new GroupCountBased);
+
 $routes->get('/products', new GetAllProducts());
 $routes->post('/products', new CreateProduct());
+$routes->get('/product/{id:\d+}', new GetProductById());
+$routes->put('/product/{id:\d+}', new UpdateProduct());
+$routes->delete('/product/{id:\d+}', new DeleteProduct());
+
+$routes->get('/orders', new GetAllOrders());
+$routes->post('/orders', new CreateOrder());
+$routes->get('/order/{id:\d+}', new GetOrderById());
+$routes->put('/order/{id:\d+}', new UpdateOrder());
+$routes->delete('/order/{id:\d+}', new DeleteOrder());
 
 
 $server = new HttpServer(new Router($routes));
