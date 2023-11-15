@@ -1,5 +1,7 @@
 <?php
 
+use App\Products\Controller\CreateProduct;
+use App\Products\Controller\GetAllProducts;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,17 +15,8 @@ require 'vendor/autoload.php';
 $loop = \React\EventLoop\Loop::get();
 
 $dispatcher = simpleDispatcher(function (RouteCollector $routes) {
-    $routes->get('/products', function (ServerRequestInterface $request) {
-        return new Response(
-            200, ['Content-type' => 'application/json'], json_encode(['message' => 'GET request to /products'])
-        );
-    });
-
-    $routes->post('/products', function (ServerRequestInterface $request) {
-        return new Response(
-            200, ['Content-type' => 'application/json'], json_encode(['message' => 'POST request to /products'])
-        );
-    });
+    $routes->get('/products', new GetAllProducts());
+    $routes->post('/products', new CreateProduct());
 });
 
 $server = new HttpServer(function (ServerRequestInterface $request) use ($dispatcher) {
