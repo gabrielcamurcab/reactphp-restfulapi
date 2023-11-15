@@ -2,8 +2,11 @@
 
 use App\Products\Controller\CreateProduct;
 use App\Products\Controller\GetAllProducts;
+use App\Router;
+use FastRoute\DataGenerator\GroupCountBased;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
 use React\Http\HttpServer;
@@ -14,27 +17,12 @@ require 'vendor/autoload.php';
 
 $loop = \React\EventLoop\Loop::get();
 
-$dispatcher = simpleDispatcher(function (RouteCollector $routes) {
-    $routes->get('/products', new GetAllProducts());
-    $routes->post('/products', new CreateProduct());
-});
+$routes = new RouteCollector(new Std, new GroupCountBased);
+$routes->get('/products', new GetAllProducts());
+$routes->post('/products', new CreateProduct());
 
-$server = new HttpServer(function (ServerRequestInterface $request) use ($dispatcher) {
-    $routeInfo = $dispatcher->dispatch(
-        $request->getMethod(), $request->getUri()->getPath()
-    );
 
-    switch ($routeInfo[0]) {
-        case Dispatcher::NOT_FOUND:
-            return new Response(404, ['Content-type' => 'application/json'], json_encode(['message' => 'Route not found']));
-        case Dispatcher::METHOD_NOT_ALLOWED:
-            return new Response(405, ['Content-type' => 'application/json'], json_encode(['message' => 'Method not allowed']));
-        case Dispatcher::FOUND:
-            return $routeInfo[1]($request);
-
-        throw new LogicException('Something went wrong with routing.');
-    }
-});
+$server = new HttpServer(new Router($routes));
 
 $socket = new SocketServer('127.0.0.1:8000');
 $server->listen($socket);
