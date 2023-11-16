@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
+use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use FastRoute\Dispatcher;
 use FastRoute\Dispatcher\GroupCountBased;
@@ -24,6 +25,7 @@ final class Router
 
     public function __invoke(ServerRequestInterface $request)
     {
+
         $routeInfo = $this->dispatcher->dispatch(
             $request->getMethod(),
             $request->getUri()->getPath()

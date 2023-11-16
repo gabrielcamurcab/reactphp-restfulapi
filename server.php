@@ -23,6 +23,7 @@ $loop = \React\EventLoop\Loop::get();
 
 $routes = new RouteCollector(new Std, new GroupCountBased);
 
+// Routes for products
 $routes->get('/products', new GetAllProducts());
 $routes->post('/products', new CreateProduct());
 $routes->get('/product/{id:\d+}', new GetProductById());

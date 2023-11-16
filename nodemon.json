@@ -1,0 +1,9 @@
+{
+    "verbose": false,
+    "ignore": [".git"],
+    "execMap": {
+        "php": "php"
+    },
+    "restartable": "r",
+    "exec": "php"
+}
