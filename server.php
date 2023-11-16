@@ -1,5 +1,6 @@
 <?php
 
+use App\Core\ErrorHandler;
 use App\Orders\Controller\CreateOrder;
 use App\Orders\Controller\DeleteOrder;
 use App\Orders\Controller\GetAllOrders;
@@ -10,7 +11,7 @@ use App\Products\Controller\DeleteProduct;
 use App\Products\Controller\GetAllProducts;
 use App\Products\Controller\GetProductById;
 use App\Products\Controller\UpdateProduct;
-use App\Router;
+use App\Core\Router;
 use FastRoute\DataGenerator\GroupCountBased;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
@@ -37,10 +38,14 @@ $routes->put('/order/{id:\d+}', new UpdateOrder());
 $routes->delete('/order/{id:\d+}', new DeleteOrder());
 
 
-$server = new HttpServer(new Router($routes));
+$server = new HttpServer(new ErrorHandler(), new Router($routes));
 
 $socket = new SocketServer('127.0.0.1:8000');
 $server->listen($socket);
+
+$server->on('error', function (Throwable $error) {
+    echo 'Error: ' . $error->getMessage() . PHP_EOL;
+});
 
 echo 'Listening on ' . str_replace('tcp', 'http', $socket->getAddress()) . PHP_EOL;
 $loop->run();
