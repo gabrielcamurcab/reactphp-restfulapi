@@ -58,7 +58,7 @@ As rotas da API podem ser configuradas no arquivo `routes.php`. O FastRoute é u
 
 ```php
 // Exemplo de rota no arquivo routes.php
-$dispatcher->addRoute('GET', '/api/users', 'UserController@index');
+$routes->get('/rota', new functionName());
 ```
 
 ## Contribuições
