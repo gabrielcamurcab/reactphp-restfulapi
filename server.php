@@ -1,6 +1,7 @@
 <?php
 
 use App\Core\ErrorHandler;
+use App\Core\JsonRequestDecoder;
 use App\Orders\Controller\CreateOrder;
 use App\Orders\Controller\DeleteOrder;
 use App\Orders\Controller\GetAllOrders;
@@ -38,14 +39,14 @@ $routes->put('/order/{id:\d+}', new UpdateOrder());
 $routes->delete('/order/{id:\d+}', new DeleteOrder());
 
 
-$server = new HttpServer(new ErrorHandler(), new Router($routes));
+$server = new HttpServer(new ErrorHandler(), new JsonRequestDecoder(), new Router($routes));
 
-$socket = new SocketServer('127.0.0.1:8000');
-$server->listen($socket);
+$middleware = new SocketServer('127.0.0.1:8000');
+$server->listen($middleware);
 
 $server->on('error', function (Throwable $error) {
     echo 'Error: ' . $error->getMessage() . PHP_EOL;
 });
 
-echo 'Listening on ' . str_replace('tcp', 'http', $socket->getAddress()) . PHP_EOL;
+echo 'Listening on ' . str_replace('tcp', 'http', $middleware->getAddress()) . PHP_EOL;
 $loop->run();
