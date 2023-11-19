@@ -13,15 +13,30 @@ use App\Products\Controller\GetAllProducts;
 use App\Products\Controller\GetProductById;
 use App\Products\Controller\UpdateProduct;
 use App\Core\Router;
+use Dotenv\Dotenv;
 use FastRoute\DataGenerator\GroupCountBased;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
 use React\Http\HttpServer;
+use React\MySQL\QueryResult;
 use React\Socket\SocketServer;
 
 require 'vendor/autoload.php';
+$env = Dotenv::createImmutable(__DIR__, '.env');
+$env->load();
 
 $loop = \React\EventLoop\Loop::get();
+$mysql = new \React\MySQL\Factory($loop);
+$uri = $_ENV['DB_USER'] . ':' . $_ENV['DB_PASS'] . '@' . $_ENV['DB_HOST'] . '/' . $_ENV['DB_NAME'];
+$connection = $mysql->createLazyConnection($uri);
+
+$connection->query('SHOW TABLES')
+    ->then(function (QueryResult $result) {
+        print_r("Reconectado a BD - ". $_ENV['DB_NAME']);
+    })
+    ->catch(function ($error) {
+        print_r("Erro ao conectar com DB: ". $error->getMessage());
+    });
 
 $routes = new RouteCollector(new Std, new GroupCountBased);
 
