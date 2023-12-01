@@ -20,6 +20,7 @@ use FastRoute\RouteParser\Std;
 use React\Http\HttpServer;
 use React\MySQL\QueryResult;
 use React\Socket\SocketServer;
+use App\Products\Storage as Products;
 
 require 'vendor/autoload.php';
 $env = Dotenv::createImmutable(__DIR__, '.env');
@@ -29,23 +30,16 @@ $loop = \React\EventLoop\Loop::get();
 $mysql = new \React\MySQL\Factory($loop);
 $uri = $_ENV['DB_USER'] . ':' . $_ENV['DB_PASS'] . '@' . $_ENV['DB_HOST'] . '/' . $_ENV['DB_NAME'];
 $connection = $mysql->createLazyConnection($uri);
-
-$connection->query('SHOW TABLES')
-    ->then(function (QueryResult $result) {
-        print_r("Reconectado a BD - ". $_ENV['DB_NAME']);
-    })
-    ->catch(function ($error) {
-        print_r("Erro ao conectar com DB: ". $error->getMessage());
-    });
+$products = new Products($connection);
 
 $routes = new RouteCollector(new Std, new GroupCountBased);
 
 // Routes for products
-$routes->get('/products', new GetAllProducts());
-$routes->post('/products', new CreateProduct());
-$routes->get('/product/{id:\d+}', new GetProductById());
-$routes->put('/product/{id:\d+}', new UpdateProduct());
-$routes->delete('/product/{id:\d+}', new DeleteProduct());
+$routes->get('/products', new GetAllProducts($products));
+$routes->post('/products', new CreateProduct($products));
+$routes->get('/product/{id:\d+}', new GetProductById($products));
+$routes->put('/product/{id:\d+}', new UpdateProduct($products));
+$routes->delete('/product/{id:\d+}', new DeleteProduct($products));
 
 $routes->get('/orders', new GetAllOrders());
 $routes->post('/orders', new CreateOrder());
